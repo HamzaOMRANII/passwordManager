@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="SEC VAULT: self-hosted password manager" />
+    <title>SEC VAULT</title>
+  </head>
+  <body>
+    <section id="loginView" class="login-view">
+      <form id="loginForm" class="card auth-card">
+        <span class="eyebrow">Step 1 of 2 · SEC VAULT</span>
+        <h1>SEC VAULT</h1>
+        <p class="muted">Sign in to your company vault.</p>
+        <label>Email<input name="email" type="email" required autocomplete="username" /></label>
+        <label>Password<input name="password" type="password" required autocomplete="current-password" /></label>
+        <button id="signinButton" type="submit">Send verification code</button>
+        <div id="loginError" class="auth-alert error hidden" role="alert" aria-live="assertive"></div>
+      </form>
+      <form id="otpForm" class="card auth-card hidden">
+        <span class="eyebrow">Step 2 of 2 · Email verification</span>
+        <h1>Enter your code</h1>
+        <p class="muted" id="otpMessage">We sent a one-time code to your email address.</p>
+        <label>Verification code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" maxlength="8" required /></label>
+        <button type="submit">Verify and sign in</button>
+        <button type="button" id="resendOtp" class="secondary">Resend a new code</button>
+        <button type="button" id="backToLogin" class="secondary">Back</button>
+        <button type="button" id="useSecretCode" class="secondary">Use secret code</button>
+        <div id="otpError" class="auth-alert error hidden" role="alert" aria-live="assertive"></div>
+      </form>
+      <form id="secretLoginForm" class="card auth-card hidden">
+        <span class="eyebrow">Step 2 of 2 · Secret code</span>
+        <h1>Secret code</h1>
+        <p class="muted" id="secretLoginMessage">Can't receive the email code? Enter the 8-character secret code you set for this account.</p>
+        <label>Secret code<input name="secretCode" type="password" minlength="8" maxlength="8" autocomplete="off" spellcheck="false" required /></label>
+        <button type="submit">Verify secret code</button>
+        <button type="button" id="backToOtp" class="secondary">Use email code instead</button>
+        <button type="button" id="secretBackToLogin" class="secondary">Back</button>
+        <div id="secretLoginError" class="auth-alert error hidden" role="alert" aria-live="assertive"></div>
+      </form>
+    </section>
+
+    <div id="appView" class="app hidden">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">S</span><div><strong>SEC VAULT</strong><small>Secure password vault</small></div></div>
+        <nav id="mainNav">
+          <button class="nav-item active" data-view="dashboard">Overview</button>
+          <button class="nav-item" data-view="passwords">Passwords</button>
+          <button class="nav-item admin-only" data-view="platforms">Platforms</button>
+          <button class="nav-item admin-only" data-view="users">Users</button>
+          <button class="nav-item" data-view="access">Access management</button>
+          <button class="nav-item" data-view="useful-links">Util links</button>
+          <button class="nav-item" data-view="it-tools">IT tools</button>
+          <button class="nav-item" data-view="profile">Profile settings</button>
+        </nav>
+        <div class="sidebar-footer"><span id="sessionUser"></span><small id="sessionRole"></small><button id="changeSecretCode" class="ghost">Secret code</button><button id="logout" class="ghost">Sign out</button></div>
+      </aside>
+
+      <main class="content">
+        <header class="topbar"><div><span class="eyebrow">SEC VAULT</span><h1 id="pageTitle">Overview</h1></div><button id="mobileMenu" class="ghost mobile-menu">Menu</button></header>
+        <div id="notice" class="notice hidden" role="status"></div>
+
+        <section id="view-dashboard" class="view active">
+          <div id="overviewStats" class="stats">
+            <button type="button" class="stat overview-link" data-overview-view="users"><span>Users</span><strong id="statUsers">0</strong><small id="usersOverviewHint">Manage company users</small></button>
+            <button type="button" class="stat overview-link" data-overview-view="passwords"><span>Passwords</span><strong id="statPasswords">0</strong><small>Open your available passwords</small></button>
+            <button type="button" class="stat overview-link" data-overview-view="access"><span>Access management</span><strong id="statAccess">0</strong><small>Review active sharing grants</small></button>
+          </div>
+          <div class="card export-card superadmin-only">
+            <div><h3>Export database</h3><p class="muted">JSON: every collection in one file, secrets stay encrypted (needs the original VAULT_MASTER_KEY). Excel: readable passwords, logins and links. Store it securely.</p></div>
+            <div class="actions"><button type="button" id="exportDatabase">Export JSON</button><button type="button" id="exportExcel">Export Excel</button></div>
+          </div>
+        </section>
+
+        <section id="view-passwords" class="view">
+          <div class="section-head"><p class="muted section-description">Your private passwords and passwords shared with you.</p><div class="section-actions"><input id="vaultSearch" type="search" placeholder="Search passwords..." aria-label="Search passwords by keyword" autocomplete="off" /><button id="newVault">Add password</button></div></div>
+          <div class="card table-wrap"><table><thead><tr><th>Name</th><th>Platform</th><th>Username / email</th><th>Access</th><th>Actions</th></tr></thead><tbody id="vaultRows"></tbody></table></div>
+        </section>
+
+        <section id="view-platforms" class="view admin-only">
+          <div class="section-head"><p class="muted section-description">Websites and services stored in the vault.</p><button id="newPlatform">Add platform</button></div>
+          <div class="card table-wrap"><table><thead><tr><th>Name</th><th>Category</th><th>Login URL</th><th>Actions</th></tr></thead><tbody id="platformRows"></tbody></table></div>
+        </section>
+
+        <section id="view-users" class="view admin-only">
+          <div class="section-head"><p class="muted section-description">Manage company members and administrators.</p><button id="newUser">Add user</button></div>
+          <div class="card table-wrap"><table><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead><tbody id="userRows"></tbody></table></div>
+        </section>
+
+        <section id="view-access" class="view">
+          <div class="section-head"><p class="muted section-description">Review sharing by user or by password.</p></div>
+          <div class="segmented"><button class="access-mode active" data-access-mode="users">Users</button><button class="access-mode" data-access-mode="passwords">Passwords</button></div>
+          <div class="access-browser">
+            <div class="card access-list"><h3 id="accessListTitle">Users</h3><div id="accessEntities"></div></div>
+            <div class="card access-detail"><div id="accessDetailEmpty" class="empty">Select a user to see all passwords they can access.</div><div id="accessDetails"></div></div>
+          </div>
+          <form id="accessForm" class="card form-grid access-editor">
+            <h3 class="wide">Share a password</h3>
+            <label>Password<select name="vaultItemId" id="accessVault" required></select></label>
+            <label>User<select name="userId" id="accessUser" required></select></label>
+            <fieldset><legend>Permissions</legend><label class="check"><input type="checkbox" name="permissions" value="view" checked /> View</label><label class="check"><input type="checkbox" name="permissions" value="reveal" checked /> Reveal</label><label class="check"><input type="checkbox" name="permissions" value="edit" /> Edit</label><label class="check"><input type="checkbox" name="permissions" value="manageAccess" /> Share with others</label></fieldset>
+            <div class="form-actions"><button type="submit">Save access</button><button type="button" id="revokeAccess" class="danger secondary">Revoke access</button></div>
+          </form>
+        </section>
+
+        <section id="view-useful-links" class="view">
+          <div class="section-head"><p class="muted section-description">Useful company resources grouped by category.</p><button id="newUsefulLink" class="admin-only">Add link</button></div>
+          <div class="card table-wrap"><table><thead><tr><th>Category</th><th>Link</th><th class="admin-only">Actions</th></tr></thead><tbody id="usefulLinkRows"></tbody></table></div>
+        </section>
+
+        <section id="view-profile" class="view">
+          <div class="section-head"><p class="muted section-description">Signed in as <strong id="profileEmail"></strong>. Changing your password or email signs out your other sessions.</p></div>
+          <div class="profile-grid">
+            <form id="passwordForm" class="card form-grid">
+              <h3 class="wide">Change password</h3>
+              <label class="wide">Current password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
+              <label>New password<input name="newPassword" type="password" minlength="14" autocomplete="new-password" required /></label>
+              <label>Confirm new password<input name="confirmPassword" type="password" minlength="14" autocomplete="new-password" required /></label>
+              <p class="muted wide">At least 14 characters.</p>
+              <div class="form-actions"><button type="submit">Change password</button></div>
+            </form>
+
+            <div class="card">
+              <form id="emailForm" class="form-grid">
+                <h3 class="wide">Change email</h3>
+                <label class="wide">New email<input name="newEmail" type="email" autocomplete="email" required /></label>
+                <label class="wide">Current password<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
+                <p class="muted wide">A code is sent to the new address. Your email changes only after you confirm it.</p>
+                <div class="form-actions"><button type="submit" id="emailSubmit">Send code to new email</button></div>
+              </form>
+              <form id="emailConfirmForm" class="form-grid hidden">
+                <h3 class="wide">Confirm new email</h3>
+                <p class="muted wide" id="emailConfirmMessage"></p>
+                <label class="wide">Verification code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" maxlength="8" required /></label>
+                <div class="form-actions"><button type="submit">Confirm email</button><button type="button" id="emailConfirmCancel" class="secondary">Cancel</button></div>
+              </form>
+            </div>
+
+            <div class="card form-grid">
+              <h3 class="wide">Secret code</h3>
+              <p class="muted wide">Your 8-character recovery code, used to sign in when the email code cannot be received.</p>
+              <div class="form-actions"><button type="button" id="profileSecretCode" class="secondary">Change secret code</button></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-it-tools" class="view">
+          <div class="section-head"><p class="muted section-description">Embedded bcrypt utility provided by the <a href="https://github.com/CorentinTh/it-tools" target="_blank" rel="noopener noreferrer">IT Tools project</a>.</p><a class="button-link" href="https://it-tools.tech/bcrypt" target="_blank" rel="noopener noreferrer">Open in new tab</a></div>
+          <div class="tool-frame-wrap"><iframe id="itToolsFrame" data-src="https://it-tools.tech/bcrypt" title="IT Tools bcrypt utility" loading="lazy" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-modals" allow="clipboard-read; clipboard-write"></iframe></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="userDialog"><form id="userForm" method="dialog" class="dialog-form"><div class="dialog-head"><h2 id="userDialogTitle">Add user</h2><button type="button" class="icon close-dialog">×</button></div><input type="hidden" name="id" /><div class="form-grid"><label>First name<input name="firstName" required maxlength="80" /></label><label>Last name<input name="lastName" required maxlength="80" /></label><label>Email<input name="email" type="email" required /></label><label>Role<select name="role"><option value="member">Member</option><option value="admin">Admin</option><option value="superAdmin">Super admin</option></select></label><label id="passwordField">Temporary password<input name="password" type="password" minlength="14" /></label><label id="statusField" class="hidden">Status<select name="status"><option value="active">Active</option><option value="disabled">Disabled</option></select></label></div><div class="form-actions"><button type="submit">Save user</button><button type="button" class="secondary close-dialog">Cancel</button></div></form></dialog>
+
+    <dialog id="platformDialog"><form id="platformForm" method="dialog" class="dialog-form"><div class="dialog-head"><h2 id="platformDialogTitle">Add platform</h2><button type="button" class="icon close-dialog">×</button></div><input type="hidden" name="id" /><div class="form-grid"><label>Name<input name="name" required maxlength="120" /></label><label>Category<input name="category" maxlength="80" placeholder="Email, Cloud, AI..." /></label><label>Website URL<input name="websiteUrl" type="url" /></label><label>Login URL<input name="loginUrl" type="url" /></label></div><div class="form-actions"><button type="submit">Save platform</button><button type="button" class="secondary close-dialog">Cancel</button></div></form></dialog>
+
+    <dialog id="vaultDialog"><form id="vaultForm" method="dialog" class="dialog-form"><div class="dialog-head"><h2 id="vaultDialogTitle">Add password</h2><button type="button" class="icon close-dialog">×</button></div><input type="hidden" name="id" /><div class="form-grid"><label>Name<input name="name" required maxlength="120" /></label><label>Platform<select name="platformId" id="vaultPlatform" required></select></label><label>Username / email<input name="username" /></label><label id="vaultTypeField" class="admin-only">Vault type<select name="vaultType"><option value="personal">My private password</option><option value="company">Company password</option></select></label><label>Password<input name="password" type="password" required /></label><label>TOTP secret<input name="totpSecret" autocomplete="off" /></label><label class="wide">Recovery codes<textarea name="recoveryCodes" rows="3" placeholder="One recovery code per line"></textarea></label><label class="wide">Sensitive notes<textarea name="notes" rows="3"></textarea></label></div><div class="form-actions"><button type="submit">Save password</button><button type="button" class="secondary close-dialog">Cancel</button></div></form></dialog>
+
+    <dialog id="usefulLinkDialog"><form id="usefulLinkForm" method="dialog" class="dialog-form"><div class="dialog-head"><h2 id="usefulLinkDialogTitle">Add useful link</h2><button type="button" class="icon close-dialog">×</button></div><input type="hidden" name="id" /><div class="form-grid"><label>Category<input name="category" required maxlength="80" placeholder="Design" /></label><label>Link<input name="url" required maxlength="2048" placeholder="figma.com" /></label></div><div class="form-actions"><button type="submit">Save link</button><button type="button" class="secondary close-dialog">Cancel</button></div></form></dialog>
+
+    <dialog id="secretCodeDialog"><form id="secretCodeForm" method="dialog" class="dialog-form"><div class="dialog-head"><h2 id="secretCodeTitle">Set your secret code</h2><button type="button" id="secretCodeClose" class="icon close-dialog">×</button></div><p class="muted" id="secretCodeIntro">Choose an 8-character secret code. If you ever cannot receive the email code, you can sign in with your password and this code.</p><div class="form-grid"><label id="currentPasswordField" class="wide hidden">Current account password<input name="currentPassword" type="password" autocomplete="current-password" /></label><label>Secret code<input name="secretCode" type="password" minlength="8" maxlength="8" autocomplete="new-password" spellcheck="false" required /></label><label>Confirm secret code<input name="confirmSecretCode" type="password" minlength="8" maxlength="8" autocomplete="new-password" spellcheck="false" required /></label><p class="muted wide">Exactly 8 characters, no spaces: digits only, letters only, or a mix. Case-sensitive. Must differ from your password.</p></div><div id="secretCodeError" class="auth-alert error hidden" role="alert"></div><div class="form-actions"><button type="submit">Save secret code</button><button type="button" id="secretCodeCancel" class="secondary close-dialog">Cancel</button></div></form></dialog>
+
+    <dialog id="excelDialog"><form id="excelForm" method="dialog" class="dialog-form"><div class="dialog-head"><h2>Export Excel</h2><button type="button" class="icon close-dialog">×</button></div><p class="muted">The spreadsheet contains your passwords in readable form. Confirm with your account password.</p><div class="form-grid"><label class="wide">Account password<input name="password" type="password" autocomplete="current-password" required /></label></div><div class="form-actions"><button type="submit" id="excelSubmit">Export Excel</button><button type="button" class="secondary close-dialog">Cancel</button></div></form></dialog>
+
+    <script type="module" src="/src/client/main.js"></script>
+  </body>
+</html>

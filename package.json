@@ -1,0 +1,34 @@
+{
+  "name": "sec-vault",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SEC VAULT: self-hosted password manager",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "concurrently -k -n server,vite \"node --watch src/server.js\" \"vite --configLoader runner\"",
+    "build": "vite build --configLoader runner",
+    "preview": "vite preview --configLoader runner",
+    "start": "node src/server.js",
+    "bootstrap": "node scripts/bootstrap.js",
+    "check": "node --check src/server.js && node --check src/app.js && vite build --configLoader runner"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "argon2": "^0.44.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
+    "exceljs": "^4.4.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.1",
+    "nodemailer": "^10.1.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "vite": "^7.1.12"
+  }
+}
