@@ -3,14 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="SEC VAULT: self-hosted password manager" />
-    <title>SEC VAULT</title>
+    <meta name="description" content="Omrani Pass: self-hosted password manager" />
+    <meta name="theme-color" content="#0B0D12" />
+    <link rel="icon" href="/brand/pass-icon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/brand/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>Omrani Pass</title>
   </head>
   <body>
     <section id="loginView" class="login-view">
+      <div class="login-brand">
+        <img src="/brand/pass-logo-dark.svg" alt="Omrani Pass" width="96" height="96" />
+        <span class="wordmark" aria-hidden="true"><span class="wordmark-omrani">omrani</span><span class="wordmark-pass">pass</span></span>
+      </div>
       <form id="loginForm" class="card auth-card">
-        <span class="eyebrow">Step 1 of 2 · SEC VAULT</span>
-        <h1>SEC VAULT</h1>
+        <span class="eyebrow">Step 1 of 2 · Sign in</span>
+        <h1>Sign in</h1>
         <p class="muted">Sign in to your company vault.</p>
         <label>Email<input name="email" type="email" required autocomplete="username" /></label>
         <label>Password<input name="password" type="password" required autocomplete="current-password" /></label>
@@ -42,7 +51,7 @@
 
     <div id="appView" class="app hidden">
       <aside class="sidebar">
-        <div class="brand"><span class="brand-mark">S</span><div><strong>SEC VAULT</strong><small>Secure password vault</small></div></div>
+        <div class="brand"><img class="brand-logo" src="/brand/pass-logo-dark.svg" alt="Omrani Pass" width="38" height="38" /><div><span class="wordmark" aria-hidden="true"><span class="wordmark-omrani">omrani</span><span class="wordmark-pass">pass</span></span><small>Secure password vault</small></div></div>
         <nav id="mainNav">
           <button class="nav-item active" data-view="dashboard">Overview</button>
           <button class="nav-item" data-view="passwords">Passwords</button>
@@ -57,7 +66,7 @@
       </aside>
 
       <main class="content">
-        <header class="topbar"><div><span class="eyebrow">SEC VAULT</span><h1 id="pageTitle">Overview</h1></div><button id="mobileMenu" class="ghost mobile-menu">Menu</button></header>
+        <header class="topbar"><div><span class="eyebrow">Omrani Pass</span><h1 id="pageTitle">Overview</h1></div><button id="mobileMenu" class="ghost mobile-menu">Menu</button></header>
         <div id="notice" class="notice hidden" role="status"></div>
 
         <section id="view-dashboard" class="view active">

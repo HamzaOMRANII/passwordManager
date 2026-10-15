@@ -51,10 +51,13 @@ a { color: var(--white); text-decoration: underline; text-underline-offset: 3px;
 a:hover { text-decoration-color: var(--white); background: var(--white); color: #000; }
 
 /* Login */
-.login-view { min-height: 100vh; display: grid; place-items: center; padding: 24px; background-color: #000; background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); background-size: 32px 32px; }
+.login-view { min-height: 100vh; display: grid; place-items: center; align-content: center; gap: 22px; padding: 24px; background-color: #000; background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); background-size: 32px 32px; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 0; padding: 22px; }
 .auth-card { position: relative; width: min(460px, 100%); border-color: var(--line-strong); box-shadow: 8px 8px 0 #ffffff12; }
 .auth-card::before { content: "root@vault:~$ ./login"; display: block; margin: -22px -22px 18px; padding: 7px 12px; border-bottom: 1px solid var(--line-strong); background: var(--panel-2); color: var(--dim); font-size: .75rem; }
+.login-brand { display: grid; justify-items: center; gap: 12px; }
+.login-brand img { width: 96px; height: 96px; }
+.login-brand .wordmark { font-size: 1.6rem; }
 .auth-card h1 { margin: 8px 0; text-transform: uppercase; }
 .auth-card h1::after, .topbar h1::after { content: "_"; margin-left: 4px; animation: blink 1.05s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
@@ -72,9 +75,12 @@ select option { background: #000; color: var(--white); }
 .app { min-height: 100vh; display: grid; grid-template-columns: 250px 1fr; }
 .sidebar { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 22px 14px; background: #000; border-right: 1px solid var(--line-strong); }
 .brand { display: flex; align-items: center; gap: 11px; padding: 0 8px 26px; }
-.brand-mark { display: grid; place-items: center; width: 38px; height: 38px; background: var(--white); color: #000; font-size: 1.25rem; font-weight: 900; }
-.brand strong { text-transform: uppercase; letter-spacing: .12em; }
-.brand strong, .brand small, .sidebar-footer span, .sidebar-footer small { display: block; }
+.brand-logo { flex: none; width: 38px; height: 38px; }
+/* Omrani Pass wordmark; "omrani" is white because the app background is dark. */
+.wordmark { display: flex; gap: .3em; font-size: 1.05rem; letter-spacing: .01em; line-height: 1.2; }
+.wordmark-omrani { font-weight: 700; color: var(--white); }
+.wordmark-pass { font-weight: 600; color: #DC2626; }
+.brand small, .sidebar-footer span, .sidebar-footer small { display: block; }
 nav { display: grid; gap: 2px; }
 .nav-item { text-align: left; color: var(--dim); background: transparent; border: 1px solid transparent; font-weight: 600; text-transform: none; letter-spacing: .02em; font-size: .88rem; padding: 9px 10px; }
 .nav-item::before { content: "  "; white-space: pre; }
