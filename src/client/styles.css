@@ -97,6 +97,7 @@ nav { display: grid; gap: 2px; }
 .topbar h1, .section-head h2 { margin: 5px 0 0; text-transform: uppercase; letter-spacing: .06em; }
 .section-head { margin-bottom: 18px; }
 .filter-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; padding: 10px 13px; border: 1px dashed var(--line-strong); color: var(--dim); }
+.tap-target { user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 .filter-bar strong { color: var(--white); }
 .section-head p { margin: 5px 0 0; }
 .section-description { margin-top: 0 !important; }

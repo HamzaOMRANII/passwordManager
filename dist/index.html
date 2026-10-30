@@ -10,8 +10,8 @@
     <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>Omrani Pass</title>
-    <script type="module" crossorigin src="/assets/index-BXe6Ntzo.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-hOQvi4fK.css">
+    <script type="module" crossorigin src="/assets/index-C37QfIcT.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BEGKR8r6.css">
   </head>
   <body>
     <section id="loginView" class="login-view">
@@ -30,13 +30,12 @@
       </form>
       <form id="otpForm" class="card auth-card hidden">
         <span class="eyebrow">Step 2 of 2 · Email verification</span>
-        <h1>Enter your code</h1>
+        <h1 id="otpTitle" class="tap-target">Enter your code</h1>
         <p class="muted" id="otpMessage">We sent a one-time code to your email address.</p>
         <label>Verification code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" maxlength="8" required /></label>
         <button type="submit">Verify and sign in</button>
         <button type="button" id="resendOtp" class="secondary">Resend a new code</button>
         <button type="button" id="backToLogin" class="secondary">Back</button>
-        <button type="button" id="useSecretCode" class="secondary">Use secret code</button>
         <div id="otpError" class="auth-alert error hidden" role="alert" aria-live="assertive"></div>
       </form>
       <form id="secretLoginForm" class="card auth-card hidden">

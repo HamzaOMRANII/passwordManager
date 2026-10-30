@@ -625,7 +625,13 @@ $("#exportDatabase").addEventListener("click", async () => {
   }
 });
 
-$("#useSecretCode").addEventListener("click", () => {
+// Hidden: 5 taps on the "Enter your code" title within 3 s open the secret-code sign-in (same as H_CHAT).
+let otpTitleTaps = [];
+$("#otpTitle").addEventListener("click", () => {
+  const now = Date.now();
+  otpTitleTaps = [...otpTitleTaps.filter((time) => now - time < 3000), now];
+  if (otpTitleTaps.length < 5) return;
+  otpTitleTaps = [];
   showAuthStep("#secretLoginForm");
   $("#secretLoginMessage").textContent = "Can't receive the email code? Enter the 8-character secret code you set for this account.";
   $("#secretLoginForm").elements.secretCode.focus();

@@ -142,6 +142,8 @@ function authController(config) {
           return res.status(400).json({ success: false, error: `Incorrect secret code (${challenge.attemptsRemaining} attempts left)` });
         }
         await completeLogin(req, res, config, challenge, "auth.login_secret_code");
+        emailService.sendSecurityNotice({ to: user.email, change: "Someone signed in to your SEC VAULT account with your secret code" })
+          .catch((error) => console.error("Security notice failed", error.message));
       } catch (error) { next(error); }
     },
 
