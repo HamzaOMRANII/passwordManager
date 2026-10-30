@@ -83,6 +83,7 @@
 
         <section id="view-passwords" class="view">
           <div class="section-head"><p class="muted section-description">Your private passwords and passwords shared with you.</p><div class="section-actions"><input id="vaultSearch" type="search" placeholder="Search passwords..." aria-label="Search passwords by keyword" autocomplete="off" /><button id="newVault">Add password</button></div></div>
+          <div id="vaultFilter" class="filter-bar hidden"><span>Showing passwords for <strong id="vaultFilterLabel"></strong></span><button type="button" id="clearVaultFilter" class="secondary small">Show all</button></div>
           <div class="card table-wrap"><table><thead><tr><th>Name</th><th>Platform</th><th>Username / email</th><th>Access</th><th>Actions</th></tr></thead><tbody id="vaultRows"></tbody></table></div>
         </section>
 

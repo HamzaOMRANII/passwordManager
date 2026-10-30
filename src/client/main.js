@@ -4,6 +4,8 @@ const state = {
   user: null, users: [], platforms: [], vault: [], usefulLinks: [],
   access: { items: [], users: [], grants: [] },
   accessMode: "users", challengeId: null,
+  // Set from the Platforms / Users screens: { type: "platform" | "user", id, label }
+  vaultFilter: null,
 };
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -122,6 +124,25 @@ function appendRevealDetail(container, label, value, options = {}) {
   container.append(detail);
 }
 
+function itemPlatformId(item) {
+  return String(item.platformId?._id || item.platformId || "");
+}
+
+function vaultItemsForPlatform(platformId) {
+  return state.vault.filter((item) => itemPlatformId(item) === String(platformId));
+}
+
+function vaultItemsForUser(user) {
+  return state.vault.filter((item) => userAccessToItem(user, item));
+}
+
+function showVaultFiltered(filter) {
+  state.vaultFilter = filter;
+  $("#vaultSearch").value = "";
+  renderVault();
+  showView("passwords");
+}
+
 function renderUsers() {
   const rows = $("#userRows");
   rows.replaceChildren();
@@ -143,7 +164,7 @@ function renderUsers() {
     const actionCell = document.createElement("td");
     const actions = document.createElement("div");
     actions.className = "actions";
-    actions.append(makeButton("Edit", "edit-user", user._id));
+    actions.append(makeButton(`Passwords (${vaultItemsForUser(user).length})`, "user-passwords", user._id), makeButton("Edit", "edit-user", user._id));
     if (user.status === "active" && user._id !== state.user._id) actions.append(makeButton("Disable", "delete-user", user._id, "danger small"));
     actionCell.append(actions);
     row.append(identity, role, status, actionCell);
@@ -180,7 +201,7 @@ function renderPlatforms() {
     const actionCell = document.createElement("td");
     const actions = document.createElement("div");
     actions.className = "actions";
-    actions.append(makeButton("Edit", "edit-platform", platform._id), makeButton("Archive", "delete-platform", platform._id, "danger small"));
+    actions.append(makeButton(`Passwords (${vaultItemsForPlatform(platform._id).length})`, "platform-passwords", platform._id), makeButton("Edit", "edit-platform", platform._id), makeButton("Archive", "delete-platform", platform._id, "danger small"));
     actionCell.append(actions);
     row.append(name, category, url, actionCell);
     rows.append(row);
@@ -195,7 +216,14 @@ function renderVault() {
   const rows = $("#vaultRows");
   rows.replaceChildren();
   const query = $("#vaultSearch").value.trim().toLowerCase();
-  const visibleItems = state.vault.filter((item) => [
+  const filter = state.vaultFilter;
+  $("#vaultFilter").classList.toggle("hidden", !filter);
+  $("#vaultFilterLabel").textContent = filter?.label || "";
+  let filterUser = null;
+  if (filter?.type === "user") filterUser = state.users.find((user) => user._id === filter.id) || { _id: filter.id };
+  const scopedItems = !filter ? state.vault
+    : filter.type === "platform" ? vaultItemsForPlatform(filter.id) : vaultItemsForUser(filterUser);
+  const visibleItems = scopedItems.filter((item) => [
     item.name,
     item.username,
     item.platformId?.name,
@@ -210,6 +238,7 @@ function renderVault() {
     empty.colSpan = 5;
     empty.textContent = query
       ? "No passwords match your search."
+      : filter ? `No passwords linked to ${filter.label}.`
       : (isAdmin() ? "No passwords yet. Add the first password." : "No credentials assigned yet.");
     row.append(empty);
     rows.append(row);
@@ -761,12 +790,22 @@ $("#logout").addEventListener("click", async () => {
 
 $("#mainNav").addEventListener("click", (event) => {
   const button = event.target.closest("[data-view]");
-  if (button) showView(button.dataset.view);
+  if (!button) return;
+  // The menu always opens the full list; filters come from the Platforms / Users buttons.
+  if (button.dataset.view === "passwords" && state.vaultFilter) {
+    state.vaultFilter = null;
+    renderVault();
+  }
+  showView(button.dataset.view);
 });
 $("#overviewStats").addEventListener("click", (event) => {
   const card = event.target.closest("[data-overview-view]");
   if (!card) return;
   let view = card.dataset.overviewView;
+  if (view === "passwords" && state.vaultFilter) {
+    state.vaultFilter = null;
+    renderVault();
+  }
   if (view === "users" && !isAdmin()) {
     view = "access";
     state.accessMode = "users";
@@ -777,6 +816,10 @@ $("#overviewStats").addEventListener("click", (event) => {
 });
 $("#mobileMenu").addEventListener("click", () => document.body.classList.toggle("menu-open"));
 $("#vaultSearch").addEventListener("input", renderVault);
+$("#clearVaultFilter").addEventListener("click", () => {
+  state.vaultFilter = null;
+  renderVault();
+});
 $("#newUser").addEventListener("click", () => openUserDialog());
 $("#newPlatform").addEventListener("click", () => openPlatformDialog());
 $("#newVault").addEventListener("click", () => openVaultDialog().catch((error) => notify(error.message, "error")));
@@ -877,6 +920,14 @@ document.addEventListener("click", async (event) => {
   if (!button) return;
   const { action, id } = button.dataset;
   try {
+    if (action === "platform-passwords") {
+      const platform = state.platforms.find((entry) => entry._id === id);
+      showVaultFiltered({ type: "platform", id, label: `platform ${platform?.name || ""}` });
+    }
+    if (action === "user-passwords") {
+      const user = state.users.find((entry) => entry._id === id);
+      showVaultFiltered({ type: "user", id, label: user ? `${user.firstName} ${user.lastName}` : "this user" });
+    }
     if (action === "edit-user") openUserDialog(state.users.find((user) => user._id === id));
     if (action === "edit-platform") openPlatformDialog(state.platforms.find((platform) => platform._id === id));
     if (action === "edit-vault") await openVaultDialog(state.vault.find((item) => item._id === id));
